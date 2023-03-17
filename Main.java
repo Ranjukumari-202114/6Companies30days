@@ -6,30 +6,51 @@ Write your code in this editor and press "Run" button to execute it.
 
 *******************************************************************************/
 
-class Solution {
-    public TreeNode buildTree(int[] inorder, int[] postorder) {
-       Map<Integer, Integer> inToIndex = new HashMap<>();
+class TrieNode {
+  public TrieNode[] children = new TrieNode[26];
+  public boolean isWord = false;
+}
 
-    for (int i = 0; i < inorder.length; ++i)
-      inToIndex.put(inorder[i], i);
-
-    return build(inorder, 0, inorder.length - 1, postorder, 0, postorder.length - 1, inToIndex);
+class Trie {
+  public void insert(String word) {
+    TrieNode node = root;
+    for (final char c : word.toCharArray()) {
+      final int i = c - 'a';
+      if (node.children[i] == null)
+        node.children[i] = new TrieNode();
+      node = node.children[i];
+    }
+    node.isWord = true;
   }
 
-  TreeNode build(int[] inorder, int inStart, int inEnd, int[] postorder, int postStart, int postEnd,
-                 Map<Integer, Integer> inToIndex) {
-    if (inStart > inEnd)
-      return null;
+  public boolean search(String word) {
+    TrieNode node = find(word);
+    return node != null && node.isWord;
+  }
 
-    final int rootVal = postorder[postEnd];
-    final int rootInIndex = inToIndex.get(rootVal);
-    final int leftSize = rootInIndex - inStart;
+  public boolean startsWith(String prefix) {
+    return find(prefix) != null;
+  }
 
-    TreeNode root = new TreeNode(rootVal);
-    root.left = build(inorder, inStart, rootInIndex - 1, postorder, postStart,
-                      postStart + leftSize - 1, inToIndex);
-    root.right = build(inorder, rootInIndex + 1, inEnd, postorder, postStart + leftSize,
-                       postEnd - 1, inToIndex);
-    return root; 
+  private TrieNode root = new TrieNode();
+
+  private TrieNode find(String prefix) {
+    TrieNode node = root;
+    for (final char c : prefix.toCharArray()) {
+      final int i = c - 'a';
+      if (node.children[i] == null)
+        return null;
+      node = node.children[i];
     }
+    return node;
+  }
 }
+
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie obj = new Trie();
+ * obj.insert(word);
+ * boolean param_2 = obj.search(word);
+ * boolean param_3 = obj.startsWith(prefix);
+ */
